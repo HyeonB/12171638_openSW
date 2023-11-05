@@ -89,7 +89,48 @@ do
 		8)
 			echo ""
 			read -p "Do you want to get the average 'rating' of movies rated by users with 'age' between 20 and 29 and 'occupation' as 'programmer'?(y/n):" yn
-			
+			if [ "$yn" = "y" ]
+			then
+				programmer=$(cat u.user | awk -F\| '$2>=20 && $2 <=29 && $4=="programmer" {print $1}')
+				movie=$(cat u.data | awk -F"\t" '{print $2" "$1" "$3}'| sort -n -k1 -k2 | sed 's/\s/|/g')
+				prev=1
+				sum=0
+				count=0
+				for mov in $movie
+				do
+					mid=$(echo $mov | awk -F\| '{print $1}')
+					uid=$(echo $mov | awk -F\| '{print $2}')
+					rate=$(echo $mov | awk -F\| '{print $3}')
+					preid=1
+					
+					if [ $prev -ne $mid ] && [ $count -gt 0 ]
+					then
+						echo -n "$mid "
+						awk -v s=$sum -v cn=$count 'BEGIN {printf "%.5f\n", (s/cn)}'
+						sum=0
+						count=0
+					fi
+					if [ $preid -gt $uid ]
+					then
+						continue
+					fi
+					prev=$mid
+					for user in $programmer
+					do
+						if [ $uid -lt $user ]
+						then
+							preid=$user
+							break
+						fi
+						if [ $uid -eq $user ]
+						then
+							sum=$((sum+rate))
+							count=$((count+1))
+						fi
+					done
+				done
+			fi
+
 			echo ""
 			;;
 		9)
