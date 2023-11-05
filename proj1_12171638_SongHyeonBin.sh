@@ -80,7 +80,7 @@ do
 			cat u.data | awk -F"\t" -v i=$id '$1==i {print $2}' | sort -n | tr '\n' '| ' | sed 's/|$//'
 			echo""
 			echo""
-			for i in $(cat u.data | awk -F"\t" '$1==12 {print $2}' | sort -n | head -n 10)
+			for i in $(cat u.data | awk -F"\t" -v id=$id '$1==id {print $2}' | sort -n | head -n 10)
 			do
 				cat u.item | awk -F\| -v id=$i '$1==id {print $1"|"$2}'
 			done
@@ -105,7 +105,7 @@ do
 					
 					if [ $prev -ne $mid ] && [ $count -gt 0 ]
 					then
-						echo -n "$mid "
+						echo -n "$prev "
 						awk -v s=$sum -v cn=$count 'BEGIN {printf "%.5f\n", (s/cn)}'
 						sum=0
 						count=0
